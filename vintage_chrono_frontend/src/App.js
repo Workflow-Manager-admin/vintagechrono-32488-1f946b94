@@ -1,6 +1,40 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
+/*
+ * Util: useDebouncedSound — returns a function to play a sound with debouncing
+ */
+function useDebouncedSound(audioUrl, enabled, volume = 0.19, debounceMs = 100) {
+  // audioUrl: string (path to sound)
+  // enabled: boolean (sound state)
+  // volume: float (0–1), default 0.19
+  // debounceMs: ms between sound retriggers (to prevent "sound overlap" on fast UI)
+  const lastPlayed = useRef(0);
+  const audioRef = useRef(null);
+
+  // PUBLIC_INTERFACE
+  /** Returns a playSound function which triggers the sound at most once per debounce interval. */
+  function playSound() {
+    if (!enabled) return;
+    const now = Date.now();
+    if (now - lastPlayed.current < debounceMs) return;
+    lastPlayed.current = now;
+    try {
+      // Always restart from beginning for "click" effect
+      if (!audioRef.current) {
+        // Never re-load if used repeatedly (single instance for this sound)
+        audioRef.current = new window.Audio(audioUrl);
+        audioRef.current.volume = volume;
+      } else {
+        // The browser may not allow rapid play() due to restrictions, but we handle .pause()/.currentTime
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+      audioRef.current.play();
+    } catch {}
+  }
+  return playSound;
+}
 // PUBLIC_INTERFACE
 // VintageChrono Main Container Component
 // Implements all UI, logic, and responsive vintage aesthetics per requirements.
