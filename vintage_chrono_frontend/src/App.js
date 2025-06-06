@@ -4,54 +4,73 @@ import "./App.css";
 // PUBLIC_INTERFACE
 // VintageChrono Main Container Component
 // Implements all UI, logic, and responsive vintage aesthetics per requirements.
+// Now including: Wikipedia 'On This Day' API integration, all interactive controls,
+// loading animation, accessibility and responsiveness.
 function App() {
-  // --- STATE ---
-  // Today's date information
+  // --- STATE MANAGEMENT ---
+  // Today
   const today = new Date();
-  // Set up date state: year, month, day
+
+  // Selected date (year, month, day)
   const [selectedDate, setSelectedDate] = useState({
     year: today.getFullYear(),
     month: today.getMonth() + 1,
     day: today.getDate(),
   });
 
-  // Wikipedia events state
+  // Event feed (Wikipedia: On This Day)
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // UI: timeline slider year
+  // Timeline slider year (mirrors selected year)
   const [sliderYear, setSliderYear] = useState(today.getFullYear());
 
-  // UI: sound
+  // Sound state for toggling effects
   const [soundOn, setSoundOn] = useState(false);
 
-  // UI: loading sound for transitions
+  // Store last fetch date for minimal loads (avoid duplicate API fetches)
+  const lastFetchedDate = useRef(null);
+
+  // Refs for sound samples
   const quillAudioRef = useRef();
 
-  // --- UTILS ---
-  // Formats YYYY-MM-DD
-  function getDateString({ year, month, day }) {
-    return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(
-      2,
-      "0"
-    )}`;
+  // --- UTILITY: Clamp last valid DOM date for year/month ---
+  function clampDay(year, month, desiredDay) {
+    // month is 1-based; day must be valid for the month (28/29/30/31)
+    const daysInMonth = new Date(year, month, 0).getDate();
+    return Math.min(desiredDay, daysInMonth);
   }
-  // Get events (Wikipedia API)
+
+  // --- API: Fetch events for current selected date (Wikipedia) ---
   // PUBLIC_INTERFACE
   async function fetchWikipediaEvents(dateObj) {
     setLoading(true);
+
     const { month, day } = dateObj;
-    // Wikipedia 'On This Day' endpoint for English
-    // Example: https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/3/7
+    // Prevent duplicate/refetch if no change
+    const fetchKey = `${month}-${day}`;
+    if (lastFetchedDate.current === fetchKey) {
+      setLoading(false);
+      return;
+    }
+    lastFetchedDate.current = fetchKey;
+
+    // Loading sound
+    playQuill();
+
     try {
-      playQuill();
-      const res = await fetch(
+      // Wikipedia "On This Day" endpoint; e.g. .../events/7/4
+      const resp = await fetch(
         `https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/${month}/${day}`
       );
-      const data = await res.json();
-      // Filter/trim to best 10 if many
+      // Throw error if not OK
+      if (!resp.ok) throw new Error("API Error");
+
+      // API delivers shape: { events: [{year, text, pages, ...}] }
+      const data = await resp.json();
+      // Only take 5-10 events
       setEvents((data.events || []).slice(0, 10));
-    } catch (e) {
+    } catch (err) {
       setEvents([
         {
           year: "N/A",
@@ -60,125 +79,112 @@ function App() {
         },
       ]);
     }
-    setTimeout(() => setLoading(false), 900); // Show animation for a short time
+    // Give a short min time for animation
+    setTimeout(() => setLoading(false), 800);
   }
 
-  // Sound
+  // --- SOUND EFFECTS ---
   function playTypewriter() {
-    if (soundOn && window.Audio) {
-      // Simple typewriter click
-      let t = new window.Audio(
-        "https://cdn.pixabay.com/audio/2022/12/19/audio_126bfa3cb7.mp3"
-      );
-      t.volume = 0.2;
+    if (soundOn && typeof window !== "undefined" && window.Audio) {
+      const t = new window.Audio("https://cdn.pixabay.com/audio/2022/12/19/audio_126bfa3cb7.mp3");
+      t.volume = 0.19;
       t.play();
     }
   }
   function playQuill() {
     if (soundOn && quillAudioRef.current) {
-      // Fast restart
       quillAudioRef.current.pause();
       quillAudioRef.current.currentTime = 0;
       quillAudioRef.current.play();
     }
   }
 
-  // --- EFFECTS ---
-  // Load events on date change
-  useEffect(() => {
-    fetchWikipediaEvents(selectedDate);
-    // eslint-disable-next-line
-  }, [selectedDate]);
-
-  // Update sliderYear with selected or when timeline moves
-  useEffect(() => {
-    setSliderYear(selectedDate.year);
-  }, [selectedDate.year]);
-
-  // --- HANDLERS ---
-  // Date rotary: wheels
+  // --- HANDLERS: All UI Interactivity ---
   function handleDateChange(part, value) {
     playTypewriter();
     setSelectedDate((prev) => {
-      const update = { ...prev, [part]: value };
-      // Clamp day for month/year
-      let lastDay = new Date(
-        update.year,
-        update.month,
-        0
-      ).getDate(); /* month is 1-based */
-      if (update.day > lastDay) update.day = lastDay;
-      return update;
+      let next = { ...prev, [part]: value };
+      // When changing month/year: clamp day just in case (for Feb/leap/short months)
+      next.day = clampDay(next.year, next.month, next.day);
+      return next;
     });
   }
-
-  // Timeline: pocket-watch slider
-  function handleSliderYearChange(newYear) {
+  function handleSliderYearChange(year) {
     playTypewriter();
     setSelectedDate((prev) => ({
-      year: newYear,
-      month: prev.month,
-      day: prev.day > 28 ? 28 : prev.day, // clamp for February etc
+      ...prev,
+      year,
+      // Clamp day for Feb/short months
+      day: clampDay(year, prev.month, prev.day),
     }));
   }
-
-  // Wax seal random year
   function goToRandomYear() {
     playTypewriter();
-    let rand = Math.floor(Math.random() * (today.getFullYear() - 1800 + 1)) + 1800;
+    // Random year between 1800 and today
+    const randomYear = Math.floor(Math.random() * (today.getFullYear() - 1800 + 1)) + 1800;
     setSelectedDate((prev) => ({
-      year: rand,
-      month: prev.month,
-      day: prev.day,
+      ...prev,
+      year: randomYear,
+      day: clampDay(randomYear, prev.month, prev.day),
     }));
   }
-
-  // Typewriter key: "My Birth Year"
   function goToBirthYear() {
     playTypewriter();
     let y = window.prompt("Enter your birth year (e.g. 1984):");
     let yearInt = parseInt(y);
-    if (yearInt && yearInt > 1800 && yearInt <= today.getFullYear())
+    if (yearInt && yearInt > 1800 && yearInt <= today.getFullYear()) {
       setSelectedDate((prev) => ({
+        ...prev,
         year: yearInt,
-        month: prev.month,
-        day: prev.day,
+        day: clampDay(yearInt, prev.month, prev.day),
       }));
+    }
   }
 
-  // --- RENDER ---
+  // --- UI EFFECTS: Reload events on date change ---
+  useEffect(() => {
+    fetchWikipediaEvents(selectedDate);
+    setSliderYear(selectedDate.year); // keep UI timeline in sync
+    // eslint-disable-next-line
+  }, [selectedDate.month, selectedDate.day]); // always refetch if month/day changes
+
+  useEffect(() => {
+    // If user changes year via rotary or slider, sync sliderYear
+    setSliderYear(selectedDate.year);
+  }, [selectedDate.year]);
+
+  // --- JSX-RENDER ---
   return (
     <div className="vintage-app parchment-bg">
-      {/* Sound & Page Animation assets (hidden) */}
+      {/* Audio assets for effects (hidden) */}
       <audio
         ref={quillAudioRef}
         src="https://cdn.pixabay.com/audio/2022/03/15/audio_115bff429c.mp3"
         preload="auto"
         style={{ display: "none" }}
+        aria-hidden="true"
       />
-
-      {/* Vintage Masthead */}
+      {/* Masthead */}
       <header className="vintage-masthead">
         <span
           className="masthead-text"
           style={{ fontFamily: "Cormorant Garamond, Playfair Display, serif" }}
         >
-          <span className="dropcap-v">𝒫𝒶𝓈𝓉</span>
+          <span className="dropcap-v" aria-hidden="true">𝒫𝒶𝓈𝓉</span>
           Blast
         </span>
         <span className="masthead-sub">VintageChrono</span>
       </header>
 
-      {/* Main Content */}
       <main className="chronomain">
-        {/* Rotary Date Picker */}
+        {/* Rotary Date Picker - dial controls */}
         <section className="rotary-date-picker" aria-label="Pick a date">
           <DialSelector
             label="Day"
             value={selectedDate.day}
             min={1}
             max={new Date(selectedDate.year, selectedDate.month, 0).getDate()}
-            onChange={(v) => handleDateChange("day", Number(v))}
+            onChange={v => handleDateChange("day", Number(v))}
             accent
           />
           <DialSelector
@@ -186,22 +192,19 @@ function App() {
             value={selectedDate.month}
             min={1}
             max={12}
-            onChange={(v) => handleDateChange("month", Number(v))}
+            onChange={v => handleDateChange("month", Number(v))}
           />
           <DialSelector
             label="Year"
             value={selectedDate.year}
             min={1800}
             max={today.getFullYear()}
-            onChange={(v) => handleDateChange("year", Number(v))}
+            onChange={v => handleDateChange("year", Number(v))}
           />
         </section>
 
-        {/* Pocket Watch Timeline Slider */}
-        <section
-          className="pocket-timeline"
-          aria-label="Timeline slider"
-        >
+        {/* Timeline: Pocket Watch Slider */}
+        <section className="pocket-timeline" aria-label="Timeline slider">
           <PocketWatchSlider
             year={sliderYear}
             min={1800}
@@ -217,43 +220,40 @@ function App() {
             className="wax-seal-btn"
             onClick={goToRandomYear}
             tabIndex={0}
-            onKeyDown={(e) => e.key === "Enter" && goToRandomYear()}
+            onKeyDown={e => e.key === "Enter" && goToRandomYear()}
             title="Random Year"
             type="button"
           >
-            🧧
-            <span className="seal-text">Random Year</span>
+            🧧 <span className="seal-text">Random Year</span>
           </button>
           <button
             aria-label="Go to My Birth Year"
             className="typewriter-btn"
             onClick={goToBirthYear}
             tabIndex={0}
-            onKeyDown={(e) => e.key === "Enter" && goToBirthYear()}
+            onKeyDown={e => e.key === "Enter" && goToBirthYear()}
             type="button"
           >
-            📰
-            <span className="tw-text">My Birth Year</span>
+            📰 <span className="tw-text">My Birth Year</span>
           </button>
         </section>
 
-        {/* Event Feed */}
+        {/* Event Feed (with loading animation and accessibility/aria) */}
         <section className="event-feed newspaper-bg" aria-live="polite">
-          {loading && (
-            <LoadingAnimation />
-          )}
-          {!loading && events && (
-            <EventsFeed events={events} dateObj={selectedDate} />
-          )}
+          {loading && <LoadingAnimation />}
+          {!loading && events && <EventsFeed events={events} dateObj={selectedDate} />}
         </section>
       </main>
 
-      {/* Footer: Sound Toggle & Credits */}
+      {/* Footer: sound toggle & credits */}
       <footer className="vintage-footer">
         <button
           className={`sound-toggle-btn${soundOn ? " active" : ""}`}
-          aria-label={soundOn ? "Mute typewriter/phonograph sounds" : "Enable typewriter/phonograph sounds"}
-          onClick={() => setSoundOn((v) => !v)}
+          aria-label={soundOn
+            ? "Mute typewriter/phonograph sounds"
+            : "Enable typewriter/phonograph sounds"
+          }
+          onClick={() => setSoundOn(v => !v)}
           type="button"
         >
           {soundOn ? "🔊 Sound On" : "🔈 Sound Off"}
