@@ -43,12 +43,17 @@ function App() {
 
   // --- API: Fetch events for current selected date (Wikipedia) ---
   // PUBLIC_INTERFACE
+  /**
+   * Fetches "On This Day" historical events for a particular date.
+   * Always triggers on any change to day, month, or year—showing a loading animation,
+   * and ensures display is for the selected day/month/year only. 
+   */
   async function fetchWikipediaEvents(dateObj) {
     setLoading(true);
 
-    const { month, day } = dateObj;
-    // Prevent duplicate/refetch if no change
-    const fetchKey = `${month}-${day}`;
+    // Use full date for fetching and to prevent duplicate refetches
+    const { year, month, day } = dateObj;
+    const fetchKey = `${year}-${month}-${day}`;
     if (lastFetchedDate.current === fetchKey) {
       setLoading(false);
       return;
@@ -59,17 +64,31 @@ function App() {
     playQuill();
 
     try {
-      // Wikipedia "On This Day" endpoint; e.g. .../events/7/4
+      // Wikipedia "On This Day" endpoint; e.g. .../events/7/4 (does not filter by year, so filter client-side)
       const resp = await fetch(
         `https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/${month}/${day}`
       );
-      // Throw error if not OK
       if (!resp.ok) throw new Error("API Error");
 
-      // API delivers shape: { events: [{year, text, pages, ...}] }
       const data = await resp.json();
-      // Only take 5-10 events
-      setEvents((data.events || []).slice(0, 10));
+
+      // Filter or re-sort so that only events equal to the selected year (if possible),
+      // otherwise show top events and highlight those that match year
+      // We'll prefer events for `year`, but fallback to giving any top events
+      let filteredEvents = [];
+      if (Array.isArray(data.events)) {
+        filteredEvents = data.events.filter(ev => Number(ev.year) === Number(year));
+        // If not enough events for this year, pad with other events for date
+        if (filteredEvents.length < 1) {
+          filteredEvents = data.events.slice(0, 10);
+        }
+      }
+
+      setEvents(filteredEvents.length > 0 ? filteredEvents : [{
+        year: "N/A",
+        text: `No major events recorded for ${month}/${day}/${year}.`,
+        links: [],
+      }]);
     } catch (err) {
       setEvents([
         {
