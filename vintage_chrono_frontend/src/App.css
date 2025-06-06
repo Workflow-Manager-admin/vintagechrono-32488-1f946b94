@@ -127,6 +127,116 @@ body,
   align-items: center;
 }
 
+/* --- Vertically Centered Dropdown Control Stack --- */
+.controls-centered-dropdown {
+  min-height: 48vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dropdown-control-stack {
+  margin: 0 auto;
+  gap: 2.2rem;
+  background: var(--parchment-dark);
+  border-radius: 32px;
+  border: 3px double var(--accent);
+  box-shadow: 0 6px 32px #baa87c22, 0 1.5px 0 #c8ad7a36;
+  padding: 2.4em 2.7em 2.3em 2.7em;
+  max-width: 375px;
+  width: 94vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.vintage-dropdown-block {
+  width: 100%;
+  margin-bottom: 4px;
+}
+.dropdown-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 900;
+  font-size: 1.22rem;
+  color: var(--secondary);
+  margin-bottom: 5px;
+  letter-spacing: 0.5px;
+  display: block;
+}
+.vintage-dropdown-menu {
+  width: 100%;
+  padding: 0.62em 1.5em 0.62em 1.15em;
+  font-size: 1.13em;
+  border: 2.6px solid var(--accent);
+  background: radial-gradient(circle at 55% 62%, #fffbe0 82%, #e9dcc3 100%);
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  border-radius: 17px;
+  box-shadow: 0 2px 7px #dfc57c33, 0 0.5px 0 #c8ad7f21;
+  color: var(--primary);
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  cursor: pointer;
+  text-align: center;
+  transition: box-shadow 0.14s, background 0.18s, border 0.15s;
+  position: relative;
+}
+.vintage-dropdown-menu:focus,
+.vintage-dropdown-menu:hover,
+.vintage-dropdown-menu:active {
+  background: radial-gradient(circle at 52% 70%, #ededc0 82%, #eadaba 100%);
+  border-color: var(--secondary);
+  box-shadow: 0 2.5px 13px #bfa77aba, 0 0.5px 0 #c8ad7faa;
+  outline: 2.4px double var(--accent);
+}
+
+.vintage-dropdown-block.accent .vintage-dropdown-menu {
+  border: 2.6px solid var(--accent);
+  background: radial-gradient(circle, #fff9db 80%, #edd98a 100%);
+}
+.vintage-dropdown-block .vintage-dropdown-menu.surprise-dropdown {
+  background: radial-gradient(circle, #f3e1bc 65%, #bfa77a 100%);
+  border: 2.4px solid var(--accent);
+  font-style: italic;
+  letter-spacing: 0.2px;
+}
+.vintage-dropdown-block .vintage-dropdown-menu.surprise-dropdown:focus,
+.vintage-dropdown-block .vintage-dropdown-menu.surprise-dropdown:hover {
+  border-color: var(--primary);
+  background: radial-gradient(circle, #edd7a7 73%, #bfa77a 100%);
+}
+
+/* Add a vintage triangle for (faux) dropdown indicator */
+.vintage-dropdown-menu:not(.surprise-dropdown) {
+  background-image:
+    linear-gradient(to bottom, transparent 95%, #bfa77a 97%);
+  /* Show a downward triangle using background image if not surprise */
+}
+.vintage-dropdown-menu::-ms-expand {
+  display: none;
+}
+
+/* Vintage option style */
+.vintage-dropdown-menu option {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.14em;
+  color: var(--primary);
+  background: var(--parchment-dark);
+  font-weight: 900;
+  padding: 0.21em 0.5em;
+}
+
+/* Responsive layout for vertical center */
+@media (max-width: 480px) {
+  .dropdown-control-stack {
+    padding: 1em 0.9em 1em 0.9em;
+    gap: 1.13rem;
+    max-width: 97vw;
+  }
+}
+
 /* --- ROTARY DIAL DATE PICKER --- */
 .rotary-date-picker {
   display: flex;
