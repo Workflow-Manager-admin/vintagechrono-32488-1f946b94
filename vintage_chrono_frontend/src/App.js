@@ -149,7 +149,7 @@ function App() {
     fetchWikipediaEvents(selectedDate);
     setSliderYear(selectedDate.year); // keep UI timeline in sync
     // eslint-disable-next-line
-  }, [selectedDate.month, selectedDate.day]); // always refetch if month/day changes
+  }, [selectedDate.year, selectedDate.month, selectedDate.day]); // always refetch if any part changes
 
   useEffect(() => {
     // If user changes year via rotary or slider, sync sliderYear
@@ -278,17 +278,24 @@ function App() {
   );
 }
 
-// --- DIAL SELECTOR (Rotary/Brass Dial) ---
-function DialSelector({ label, min, max, value, onChange, accent }) {
-  // Create dial options
-  let items = [];
-  for (let i = min; i <= max; i++) {
-    items.push(i);
-  }
+/**
+ * DropdownDial: Date part picker in a rotary drum style with dropdown menu inside.
+ * Vintage-styled for maximum authenticity; supports months with short names option.
+ */
+function DropdownDial({
+  label,
+  min,
+  max,
+  value,
+  onChange,
+  accent,
+  options,
+  monthNames
+}) {
   return (
     <div className={`dial-selector${accent ? " accent" : ""}`}>
       <label className="dial-label">{label}</label>
-      <div className="dial-drum" role="listbox" tabIndex={0} aria-label={label}>
+      <div className="dial-drum" aria-label={label}>
         <button
           className="dial-btn"
           aria-label={`Decrease ${label}`}
@@ -298,7 +305,38 @@ function DialSelector({ label, min, max, value, onChange, accent }) {
         >
           ◀
         </button>
-        <span className="dial-number">{value}</span>
+        {/* Inline dropdown which blends as rotary/vintage appearance */}
+        <select
+          className="dial-number"
+          aria-label={`Select ${label}`}
+          style={{
+            fontSize: "1.19em",
+            border: "none",
+            background: "transparent",
+            fontFamily: "'Playfair Display', serif",
+            fontWeight: 900,
+            color: "inherit",
+            textAlign: "center",
+            appearance: "none",
+            WebkitAppearance: "none",
+            outline: "none",
+            cursor: "pointer"
+          }}
+          value={value}
+          onChange={e => onChange(Number(e.target.value))}
+        >
+          {options
+            ? options.map((v, i) => (
+                <option key={v} value={v}>
+                  {monthNames && label === "Month"
+                    ? monthNames[v-1]
+                    : v}
+                </option>
+              ))
+            : Array.from({ length: max - min + 1 }, (_, i) =>
+                <option key={min + i} value={min + i}>{min + i}</option>
+              )}
+        </select>
         <button
           className="dial-btn"
           aria-label={`Increase ${label}`}
