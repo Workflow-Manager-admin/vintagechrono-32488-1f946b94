@@ -118,15 +118,18 @@ function App() {
       day: clampDay(year, prev.month, prev.day),
     }));
   }
-  function goToRandomYear() {
+  function goToRandomDate() {
     playTypewriter();
-    // Random year between 1800 and today
+    // Random year/month/day within valid ranges
     const randomYear = Math.floor(Math.random() * (today.getFullYear() - 1800 + 1)) + 1800;
-    setSelectedDate((prev) => ({
-      ...prev,
+    const randomMonth = Math.floor(Math.random() * 12) + 1;
+    const maxDay = new Date(randomYear, randomMonth, 0).getDate();
+    const randomDay = Math.floor(Math.random() * maxDay) + 1;
+    setSelectedDate({
       year: randomYear,
-      day: clampDay(randomYear, prev.month, prev.day),
-    }));
+      month: randomMonth,
+      day: randomDay,
+    });
   }
   function goToBirthYear() {
     playTypewriter();
@@ -179,27 +182,31 @@ function App() {
       <main className="chronomain">
         {/* Rotary Date Picker - dial controls */}
         <section className="rotary-date-picker" aria-label="Pick a date">
-          <DialSelector
+          <DropdownDial
             label="Day"
             value={selectedDate.day}
             min={1}
             max={new Date(selectedDate.year, selectedDate.month, 0).getDate()}
             onChange={v => handleDateChange("day", Number(v))}
             accent
+            options={Array.from({length: new Date(selectedDate.year, selectedDate.month, 0).getDate()}, (_, i) => i + 1)}
           />
-          <DialSelector
+          <DropdownDial
             label="Month"
             value={selectedDate.month}
             min={1}
             max={12}
             onChange={v => handleDateChange("month", Number(v))}
+            options={Array.from({length: 12}, (_, i) => i + 1)}
+            monthNames={["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]}
           />
-          <DialSelector
+          <DropdownDial
             label="Year"
             value={selectedDate.year}
             min={1800}
             max={today.getFullYear()}
             onChange={v => handleDateChange("year", Number(v))}
+            options={Array.from({length: today.getFullYear() - 1800 + 1}, (_,i)=> 1800 + i)}
           />
         </section>
 
@@ -216,15 +223,15 @@ function App() {
         {/* Action Buttons */}
         <section className="action-buttons">
           <button
-            aria-label="Surprise: Jump to a random year!"
+            aria-label="Surprise: Jump to a random date!"
             className="wax-seal-btn"
-            onClick={goToRandomYear}
+            onClick={goToRandomDate}
             tabIndex={0}
-            onKeyDown={e => e.key === "Enter" && goToRandomYear()}
-            title="Random Year"
+            onKeyDown={e => e.key === "Enter" && goToRandomDate()}
+            title="Random Date"
             type="button"
           >
-            🧧 <span className="seal-text">Random Year</span>
+            🎲 <span className="seal-text">Random Date</span>
           </button>
           <button
             aria-label="Go to My Birth Year"
