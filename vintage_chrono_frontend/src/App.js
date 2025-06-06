@@ -329,70 +329,90 @@ function App() {
       </header>
 
       <main className="chronomain">
-        {/* Controls Row */}
-        <section className="control-row" aria-label="All controls" style={{display: "flex", width: "100%", alignItems: "stretch", justifyContent: "center"}}>
-          {/* Left side: Date Picker */}
-          <div className="rotary-date-picker" style={{flex: 1, minWidth: 0, justifyContent: "flex-end", gap: "1vw"}}>
-            <DropdownDial
-              label="Day"
-              value={selectedDate.day}
-              min={1}
-              max={new Date(selectedDate.year, selectedDate.month, 0).getDate()}
-              onChange={v => { typewriterSound(); handleDateChange("day", Number(v)); }}
-              accent
-              options={Array.from({length: new Date(selectedDate.year, selectedDate.month, 0).getDate()}, (_, i) => i + 1)}
-            />
-            <DropdownDial
-              label="Month"
-              value={selectedDate.month}
-              min={1}
-              max={12}
-              onChange={v => { typewriterSound(); handleDateChange("month", Number(v)); }}
-              options={Array.from({length: 12}, (_, i) => i + 1)}
-              monthNames={["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]}
-            />
-            <DropdownDial
-              label="Year"
-              value={selectedDate.year}
-              min={1800}
-              max={today.getFullYear()}
-              onChange={v => { typewriterSound(); handleDateChange("year", Number(v)); }}
-              options={Array.from({length: today.getFullYear() - 1800 + 1}, (_,i)=> 1800 + i)}
-            />
-          </div>
-          {/* Center: Random Date Button */}
-          <div className="action-buttons inline-action" style={{
-            flex: "0 0 auto",
+        {/* Controls Centered Vertical Block */}
+        <section
+          className="controls-centered-dropdown"
+          aria-label="All controls"
+          style={{
+            minHeight: "48vh",
+            minWidth: "0",
+            width: "100vw",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "0 2vw",
-            minWidth: 0
-          }}>
-            <button
-              aria-label="Surprise: Jump to a random date!"
-              className="wax-seal-btn"
-              onClick={() => { typewriterSound(); goToRandomDate(); }}
-              tabIndex={0}
-              onKeyDown={e => { if (e.key === "Enter") { typewriterSound(); goToRandomDate(); } }}
-              title="Random Date"
-              type="button"
-              style={{
-                margin: "0 auto",
-                display: "block"
-              }}
-            >
-              🎲 <span className="seal-text">Random Date</span>
-            </button>
-          </div>
-          {/* Right side: Timeline Slider */}
-          <div className="timeline-row" style={{flex: 1, minWidth: 0, justifyContent: "flex-start", display: "flex"}}>
-            <PocketWatchSlider
-              year={sliderYear}
-              min={1800}
-              max={today.getFullYear()}
-              onChange={val => { typewriterSound(); handleSliderYearChange(val); }}
-            />
+          }}
+        >
+          <div
+            className="dropdown-control-stack"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              margin: "0 auto",
+              gap: "2.2rem",
+              background: "var(--parchment-dark)",
+              borderRadius: "32px",
+              border: "3px double var(--accent)",
+              boxShadow: "0 6px 32px #baa87c22, 0 1.5px 0 #c8ad7a36",
+              padding: "2.4em 2.7em 2.3em 2.7em",
+              maxWidth: "375px",
+              width: "95vw",
+            }}
+          >
+            {/* Day dropdown */}
+            <div style={{ width: "100%", marginBottom: "6px" }}>
+              <DropdownOnly
+                label="Day"
+                value={selectedDate.day}
+                min={1}
+                max={new Date(selectedDate.year, selectedDate.month, 0).getDate()}
+                onChange={v => { typewriterSound(); handleDateChange("day", Number(v)); }}
+                options={Array.from({length: new Date(selectedDate.year, selectedDate.month, 0).getDate()}, (_, i) => i + 1)}
+                accent
+              />
+            </div>
+            {/* Month dropdown */}
+            <div style={{ width: "100%", marginBottom: "6px" }}>
+              <DropdownOnly
+                label="Month"
+                value={selectedDate.month}
+                min={1}
+                max={12}
+                onChange={v => { typewriterSound(); handleDateChange("month", Number(v)); }}
+                options={Array.from({length: 12}, (_, i) => i + 1)}
+                monthNames={["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]}
+              />
+            </div>
+            {/* Year dropdown */}
+            <div style={{ width: "100%", marginBottom: "6px" }}>
+              <DropdownOnly
+                label="Year"
+                value={selectedDate.year}
+                min={1800}
+                max={today.getFullYear()}
+                onChange={v => { typewriterSound(); handleDateChange("year", Number(v)); }}
+                options={Array.from({length: today.getFullYear() - 1800 + 1}, (_,i)=> 1800 + i)}
+              />
+            </div>
+            {/* Timeline selector as dropdown */}
+            <div style={{ width: "100%", marginBottom: "6px" }}>
+              <DropdownOnly
+                label="Timeline Year"
+                value={sliderYear}
+                min={1800}
+                max={today.getFullYear()}
+                onChange={val => { typewriterSound(); handleSliderYearChange(val); }}
+                options={Array.from({length: today.getFullYear() - 1800 + 1}, (_,i)=> 1800 + i)}
+                isTimeline={true}
+              />
+            </div>
+            {/* Random Date dropdown disguised as dropdown */}
+            <div style={{ width: "100%" }}>
+              <RandomDateDropdown
+                onRandom={() => { typewriterSound(); goToRandomDate(); }}
+              />
+            </div>
           </div>
         </section>
 
