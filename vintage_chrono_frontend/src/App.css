@@ -45,26 +45,52 @@ body,
 }
 .masthead-text {
   font-size: clamp(3.1rem, 5vw, 4.1rem);
-  color: var(--primary);
+  font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+  font-weight: 900;
   letter-spacing: 3px;
-  text-shadow: 0 2px 0 var(--accent), 0 3px 12px var(--parchment-dark);
   user-select: none;
+  /* Premium gold-sepia gradient w/ gentle bright edge, paper blend fallback for non-JS */
+  background: linear-gradient(91deg, #6a4e42 5%, #bfa77a 30%, #f3e1bc 53%, #c8ad7f 70%, #eadaba 88%, #ab845a 98%), url('https://www.transparenttextures.com/patterns/old-mathematics.png');
+  background-blend-mode: soft-light, multiply;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-fill-color: transparent;
+  text-shadow: 0 2px 0 #bfa77a, 0 3px 12px #eadaba9c;
+  filter: contrast(1.16) brightness(1.08);
+  display: inline-block;
 }
 .dropcap-v {
   font-size: 1.7em;
-  color: var(--secondary);
-  vertical-align: -0.05em;
-  letter-spacing: 2px;
+  font-family: inherit;
   font-weight: 900;
+  letter-spacing: 2px;
+  vertical-align: -0.05em;
+  /* Metallic gold dropcap gradient, texture-blend fallback for non-JS */
+  background: linear-gradient(119deg, #bfa77a 10%, #c8ad7f 39%, #f7e5b9 65%, #ab845a 85%, #6a4e42 100%), url('https://www.transparenttextures.com/patterns/old-mathematics.png');
+  background-blend-mode: overlay, multiply;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-fill-color: transparent;
+  text-shadow: 0 2px 0 #ab845a99, 0 3px 12px #eadaba80;
+  filter: contrast(1.19) brightness(1.12);
 }
 .masthead-sub {
   font-size: 1.17em;
-  color: var(--secondary);
+  font-family: "Playfair Display", "Cormorant Garamond", serif;
   font-weight: 700;
   font-style: italic;
+  letter-spacing: 2px;
   display: block;
   margin-top: 0.25em;
-  letter-spacing: 2px;
+  /* Subtle vintage ribbon gradient and old paper overlay */
+  background: linear-gradient(90deg, #ab845a 9%, #eadaba 57%, #bfa77a 90%), url('https://www.transparenttextures.com/patterns/old-mathematics.png');
+  background-blend-mode: soft-light, multiply;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-fill-color: transparent;
 }
 
 /* --- MAIN LAYOUT --- */
