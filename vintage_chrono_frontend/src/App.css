@@ -74,21 +74,30 @@ body,
 }
 
 .dropcap-v {
-  font-size: 1.7em;
+  font-size: 1.74em;
   font-family: inherit;
   font-weight: 900;
-  letter-spacing: 2px;
-  vertical-align: -0.05em;
-  /* Metallic gold dropcap gradient, texture-blend fallback for non-JS */
-  background: linear-gradient(119deg, #bfa77a 10%, #c8ad7f 39%, #f7e5b9 65%, #ab845a 85%, #6a4e42 100%), url('https://www.transparenttextures.com/patterns/old-mathematics.png');
-  background-blend-mode: overlay, multiply;
+  letter-spacing: 2.2px;
+  vertical-align: -0.09em;
+  /* Opulent multi-stop gold dropcap gradient + vignette + deeper shadow for 'metallic embossed' effect */
+  background: 
+    linear-gradient(123deg, #f7e5b9 0%, #bfa77a 18%, #c8ad7f 35%, #ebcf9d 51%, #ab845a 71%, #6a4e42 100%),
+    radial-gradient(ellipse at 50% 80%, #fbeec628 74%, #bfa77a41 100%),
+    url('https://www.transparenttextures.com/patterns/old-mathematics.png');
+  background-blend-mode: overlay, soft-light, multiply;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   text-fill-color: transparent;
-  text-shadow: 0 2px 0 #ab845a99, 0 3px 12px #eadaba80;
-  filter: contrast(1.19) brightness(1.12);
+  text-shadow:
+    0 3.5px 0 #ab845abb,
+    0 1.7px 17px #eadaba60,
+    0 8px 24px #ab845a60;
+  filter: contrast(1.2) brightness(1.13) saturate(1.12);
+  /* Slight texture overlay for antique print */
+  mix-blend-mode: color-burn;
 }
+
 .masthead-sub {
   font-size: 1.17em;
   font-family: "Playfair Display", "Cormorant Garamond", serif;
