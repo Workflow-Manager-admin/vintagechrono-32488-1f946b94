@@ -44,22 +44,35 @@ body,
   z-index: 10;
 }
 .masthead-text {
-  font-size: clamp(3.1rem, 5vw, 4.1rem);
+  font-size: clamp(3.2rem, 5.5vw, 4.3rem);
   font-family: 'Cormorant Garamond', 'Playfair Display', serif;
   font-weight: 900;
-  letter-spacing: 3px;
+  letter-spacing: 3.5px;
   user-select: none;
-  /* Premium gold-sepia gradient w/ gentle bright edge, paper blend fallback for non-JS */
-  background: linear-gradient(91deg, #6a4e42 5%, #bfa77a 30%, #f3e1bc 53%, #c8ad7f 70%, #eadaba 88%, #ab845a 98%), url('https://www.transparenttextures.com/patterns/old-mathematics.png');
-  background-blend-mode: soft-light, multiply;
+  /* Enhanced multi-stop gold-sepia gradient with deeper shadow and rich texture */
+  background: 
+    /* Main rich gold-to-sepia blend */
+    linear-gradient(95deg, #bfa77a 0%, #f5e3bb 15%, #edd5a3 26%, #efdfc3 38%, #f3e1bc 47%, #d8b67c 61%, #bfa77a 74%, #ab845a 88%, #6a4e42 100%),
+    /* Subtle vignette for antique look */
+    radial-gradient(ellipse at 50% 70%, #f7e5b905 60%, #6a4e4207 100%),
+    /* Paper texture */
+    url('https://www.transparenttextures.com/patterns/old-mathematics.png');
+  background-blend-mode: soft-light, multiply, multiply;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   text-fill-color: transparent;
-  text-shadow: 0 2px 0 #bfa77a, 0 3px 12px #eadaba9c;
-  filter: contrast(1.16) brightness(1.08);
+  /* Deeper, more ornate shadowing for 'etched' feel */
+  text-shadow:
+    0 4px 18px #eadaba86,
+    0 2.3px 0 #ab845a88,
+    0 7px 32px #6a4e4220;
+  filter: contrast(1.18) brightness(1.1) saturate(1.11);
   display: inline-block;
+  /* Whisper of paper grain at text edge */
+  mix-blend-mode: luminosity;
 }
+
 .dropcap-v {
   font-size: 1.7em;
   font-family: inherit;
