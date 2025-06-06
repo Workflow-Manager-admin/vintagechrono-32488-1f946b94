@@ -148,13 +148,7 @@ function App() {
   }
 
   // --- SOUND EFFECTS ---
-  function playTypewriter() {
-    if (soundOn && typeof window !== "undefined" && window.Audio) {
-      const t = new window.Audio("https://cdn.pixabay.com/audio/2022/12/19/audio_126bfa3cb7.mp3");
-      t.volume = 0.19;
-      t.play();
-    }
-  }
+  /** See useDebouncedSound for typewriter click. */
   function playQuill() {
     if (soundOn && quillAudioRef.current) {
       quillAudioRef.current.pause();
@@ -165,7 +159,7 @@ function App() {
 
   // --- HANDLERS: All UI Interactivity ---
   function handleDateChange(part, value) {
-    playTypewriter();
+    typewriterSound();
     setSelectedDate((prev) => {
       let next = { ...prev, [part]: value };
       // When changing month/year: clamp day just in case (for Feb/leap/short months)
@@ -174,7 +168,7 @@ function App() {
     });
   }
   function handleSliderYearChange(year) {
-    playTypewriter();
+    typewriterSound();
     setSelectedDate((prev) => ({
       ...prev,
       year,
@@ -183,7 +177,7 @@ function App() {
     }));
   }
   function goToRandomDate() {
-    playTypewriter();
+    typewriterSound();
     // Random year/month/day within valid ranges
     const randomYear = Math.floor(Math.random() * (today.getFullYear() - 1800 + 1)) + 1800;
     const randomMonth = Math.floor(Math.random() * 12) + 1;
@@ -196,7 +190,7 @@ function App() {
     });
   }
   function goToBirthYear() {
-    playTypewriter();
+    typewriterSound();
     let y = window.prompt("Enter your birth year (e.g. 1984):");
     let yearInt = parseInt(y);
     if (yearInt && yearInt > 1800 && yearInt <= today.getFullYear()) {
