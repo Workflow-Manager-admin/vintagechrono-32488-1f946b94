@@ -503,10 +503,45 @@ button:focus, a:focus {
 }
 
 /* --- RESPONSIVE LAYOUT --- */
+@media (max-width: 900px) {
+  .control-row {
+    gap: 0.6em;
+    flex-wrap: wrap;
+    padding: 0.37em 0.3em;
+    border-radius: 16px;
+  }
+  .rotary-date-picker {
+    flex-direction: column;
+    gap: 0.6em !important;
+    min-width: 97px;
+    padding: 0 !important;
+  }
+  .pocket-watch-slider {
+    max-width: 99vw;
+    padding: 0.18em 0.05em 0.22em 0.05em;
+    min-width: 95px;
+    width: 95px;
+  }
+}
 @media (max-width: 750px) {
   .chronomain { max-width: 99vw; padding: 0 0.2em 2.2em 0.2em;}
-  .rotary-date-picker { flex-direction: column; gap: 1.3em; }
-  .pocket-watch-slider { max-width: 99vw; padding: 0.7em 0.6em 1.4em 0.6em;}
+  .control-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65em;
+  }
+  .rotary-date-picker {
+    flex-direction: row !important;
+    gap: 0.7em !important;
+    justify-content: center;
+    margin-bottom: 0.35em !important;
+  }
+  .timeline-row, .pocket-watch-slider {
+    margin: 0.22em 0 !important;
+    min-width: 0 !important;
+    max-width: 97vw;
+    width: 99vw;
+  }
   .event-feed.newspaper-bg {
     padding: 1.08em 0.09em;
   }
