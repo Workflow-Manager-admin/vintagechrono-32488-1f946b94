@@ -247,7 +247,7 @@ function App() {
               value={selectedDate.day}
               min={1}
               max={new Date(selectedDate.year, selectedDate.month, 0).getDate()}
-              onChange={v => { playTypewriter(); handleDateChange("day", Number(v)); }}
+              onChange={v => { typewriterSound(); handleDateChange("day", Number(v)); }}
               accent
               options={Array.from({length: new Date(selectedDate.year, selectedDate.month, 0).getDate()}, (_, i) => i + 1)}
             />
@@ -256,7 +256,7 @@ function App() {
               value={selectedDate.month}
               min={1}
               max={12}
-              onChange={v => { playTypewriter(); handleDateChange("month", Number(v)); }}
+              onChange={v => { typewriterSound(); handleDateChange("month", Number(v)); }}
               options={Array.from({length: 12}, (_, i) => i + 1)}
               monthNames={["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]}
             />
@@ -265,7 +265,7 @@ function App() {
               value={selectedDate.year}
               min={1800}
               max={today.getFullYear()}
-              onChange={v => { playTypewriter(); handleDateChange("year", Number(v)); }}
+              onChange={v => { typewriterSound(); handleDateChange("year", Number(v)); }}
               options={Array.from({length: today.getFullYear() - 1800 + 1}, (_,i)=> 1800 + i)}
             />
           </div>
@@ -276,7 +276,7 @@ function App() {
               year={sliderYear}
               min={1800}
               max={today.getFullYear()}
-              onChange={val => { playTypewriter(); handleSliderYearChange(val); }}
+              onChange={val => { typewriterSound(); handleSliderYearChange(val); }}
             />
           </div>
           
@@ -285,9 +285,9 @@ function App() {
             <button
               aria-label="Surprise: Jump to a random date!"
               className="wax-seal-btn"
-              onClick={() => { playTypewriter(); goToRandomDate(); }}
+              onClick={() => { typewriterSound(); goToRandomDate(); }}
               tabIndex={0}
-              onKeyDown={e => { if (e.key === "Enter") { playTypewriter(); goToRandomDate(); } }}
+              onKeyDown={e => { if (e.key === "Enter") { typewriterSound(); goToRandomDate(); } }}
               title="Random Date"
               type="button"
             >
@@ -302,7 +302,7 @@ function App() {
                 ? "Mute typewriter/phonograph sounds"
                 : "Enable typewriter/phonograph sounds"
               }
-              onClick={() => { playTypewriter(); setSoundOn(v => !v); }}
+              onClick={() => { typewriterSound(); setSoundOn(v => !v); }}
               type="button"
             >
               {soundOn ? "🔊 Sound On" : "🔈 Sound Off"}
@@ -325,7 +325,7 @@ function App() {
             ? "Mute typewriter/phonograph sounds"
             : "Enable typewriter/phonograph sounds"
           }
-          onClick={() => setSoundOn(v => !v)}
+          onClick={() => { typewriterSound(); setSoundOn(v => !v); }}
           type="button"
         >
           {soundOn ? "🔊 Sound On" : "🔈 Sound Off"}
