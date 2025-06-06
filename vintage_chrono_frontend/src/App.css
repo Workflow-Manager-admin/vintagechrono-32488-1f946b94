@@ -99,15 +99,17 @@ body,
 }
 
 .masthead-sub {
-  font-size: 1.17em;
+  font-size: 1.15em;
   font-family: "Playfair Display", "Cormorant Garamond", serif;
   font-weight: 700;
   font-style: italic;
-  letter-spacing: 2px;
+  letter-spacing: 2.2px;
   display: block;
-  margin-top: 0.25em;
-  /* Subtle vintage ribbon gradient and old paper overlay */
-  background: linear-gradient(90deg, #ab845a 9%, #eadaba 57%, #bfa77a 90%), url('https://www.transparenttextures.com/patterns/old-mathematics.png');
+  margin-top: 0.29em;
+  /* Enhanced ribbon with richer gold and parchment blend for harmony */
+  background:
+    linear-gradient(90deg, #ab845a 7%, #eadaba 44%, #bfa77a 82%, #6a4e42 99%),
+    url('https://www.transparenttextures.com/patterns/old-mathematics.png');
   background-blend-mode: soft-light, multiply;
   -webkit-background-clip: text;
   background-clip: text;
