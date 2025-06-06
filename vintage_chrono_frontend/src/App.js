@@ -330,9 +330,9 @@ function App() {
 
       <main className="chronomain">
         {/* Controls Row */}
-        <section className="control-row" aria-label="All controls">
-          {/* Date Picker */}
-          <div className="rotary-date-picker">
+        <section className="control-row" aria-label="All controls" style={{display: "flex", width: "100%", alignItems: "stretch", justifyContent: "center"}}>
+          {/* Left side: Date Picker */}
+          <div className="rotary-date-picker" style={{flex: 1, minWidth: 0, justifyContent: "flex-end", gap: "1vw"}}>
             <DropdownDial
               label="Day"
               value={selectedDate.day}
@@ -360,17 +360,15 @@ function App() {
               options={Array.from({length: today.getFullYear() - 1800 + 1}, (_,i)=> 1800 + i)}
             />
           </div>
-          {/* Timeline: Pocket Watch Slider */}
-          <div className="timeline-row">
-            <PocketWatchSlider
-              year={sliderYear}
-              min={1800}
-              max={today.getFullYear()}
-              onChange={val => { typewriterSound(); handleSliderYearChange(val); }}
-            />
-          </div>
-          {/* Random Date Button */}
-          <div className="action-buttons inline-action">
+          {/* Center: Random Date Button */}
+          <div className="action-buttons inline-action" style={{
+            flex: "0 0 auto",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "0 2vw",
+            minWidth: 0
+          }}>
             <button
               aria-label="Surprise: Jump to a random date!"
               className="wax-seal-btn"
@@ -379,23 +377,22 @@ function App() {
               onKeyDown={e => { if (e.key === "Enter") { typewriterSound(); goToRandomDate(); } }}
               title="Random Date"
               type="button"
+              style={{
+                margin: "0 auto",
+                display: "block"
+              }}
             >
               🎲 <span className="seal-text">Random Date</span>
             </button>
           </div>
-          {/* Sound Toggle */}
-          <div className="action-buttons inline-action">
-            <button
-              className={`sound-toggle-btn${soundOn ? " active" : ""}`}
-              aria-label={soundOn
-                ? "Mute typewriter/phonograph sounds"
-                : "Enable typewriter/phonograph sounds"
-              }
-              onClick={() => { typewriterSound(); setSoundOn(v => !v); }}
-              type="button"
-            >
-              {soundOn ? "🔊 Sound On" : "🔈 Sound Off"}
-            </button>
+          {/* Right side: Timeline Slider */}
+          <div className="timeline-row" style={{flex: 1, minWidth: 0, justifyContent: "flex-start", display: "flex"}}>
+            <PocketWatchSlider
+              year={sliderYear}
+              min={1800}
+              max={today.getFullYear()}
+              onChange={val => { typewriterSound(); handleSliderYearChange(val); }}
+            />
           </div>
         </section>
 
@@ -406,19 +403,8 @@ function App() {
         </section>
       </main>
 
-      {/* Footer: sound toggle & credits */}
+      {/* Footer: Only credits, no sound toggle */}
       <footer className="vintage-footer">
-        <button
-          className={`sound-toggle-btn${soundOn ? " active" : ""}`}
-          aria-label={soundOn
-            ? "Mute typewriter/phonograph sounds"
-            : "Enable typewriter/phonograph sounds"
-          }
-          onClick={() => { typewriterSound(); setSoundOn(v => !v); }}
-          type="button"
-        >
-          {soundOn ? "🔊 Sound On" : "🔈 Sound Off"}
-        </button>
         <div className="footer-credits">
           <span>
             <span role="img" aria-label="Quill">
