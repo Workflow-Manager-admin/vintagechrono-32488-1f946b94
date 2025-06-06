@@ -199,69 +199,76 @@ function App() {
       </header>
 
       <main className="chronomain">
-        {/* Rotary Date Picker - dial controls */}
-        <section className="rotary-date-picker" aria-label="Pick a date">
-          <DropdownDial
-            label="Day"
-            value={selectedDate.day}
-            min={1}
-            max={new Date(selectedDate.year, selectedDate.month, 0).getDate()}
-            onChange={v => handleDateChange("day", Number(v))}
-            accent
-            options={Array.from({length: new Date(selectedDate.year, selectedDate.month, 0).getDate()}, (_, i) => i + 1)}
-          />
-          <DropdownDial
-            label="Month"
-            value={selectedDate.month}
-            min={1}
-            max={12}
-            onChange={v => handleDateChange("month", Number(v))}
-            options={Array.from({length: 12}, (_, i) => i + 1)}
-            monthNames={["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]}
-          />
-          <DropdownDial
-            label="Year"
-            value={selectedDate.year}
-            min={1800}
-            max={today.getFullYear()}
-            onChange={v => handleDateChange("year", Number(v))}
-            options={Array.from({length: today.getFullYear() - 1800 + 1}, (_,i)=> 1800 + i)}
-          />
-        </section>
-
-        {/* Timeline: Pocket Watch Slider */}
-        <section className="pocket-timeline" aria-label="Timeline slider">
-          <PocketWatchSlider
-            year={sliderYear}
-            min={1800}
-            max={today.getFullYear()}
-            onChange={handleSliderYearChange}
-          />
-        </section>
-
-        {/* Action Buttons */}
-        <section className="action-buttons">
-          <button
-            aria-label="Surprise: Jump to a random date!"
-            className="wax-seal-btn"
-            onClick={goToRandomDate}
-            tabIndex={0}
-            onKeyDown={e => e.key === "Enter" && goToRandomDate()}
-            title="Random Date"
-            type="button"
-          >
-            🎲 <span className="seal-text">Random Date</span>
-          </button>
-          <button
-            aria-label="Go to My Birth Year"
-            className="typewriter-btn"
-            onClick={goToBirthYear}
-            tabIndex={0}
-            onKeyDown={e => e.key === "Enter" && goToBirthYear()}
-            type="button"
-          >
-            📰 <span className="tw-text">My Birth Year</span>
-          </button>
+        {/* Controls Row: rotary date picker, timeline slider, random date, and sound toggle */}
+        <section className="control-row" aria-label="All controls">
+          {/* Date Picker */}
+          <div className="rotary-date-picker">
+            <DropdownDial
+              label="Day"
+              value={selectedDate.day}
+              min={1}
+              max={new Date(selectedDate.year, selectedDate.month, 0).getDate()}
+              onChange={v => { playTypewriter(); handleDateChange("day", Number(v)); }}
+              accent
+              options={Array.from({length: new Date(selectedDate.year, selectedDate.month, 0).getDate()}, (_, i) => i + 1)}
+            />
+            <DropdownDial
+              label="Month"
+              value={selectedDate.month}
+              min={1}
+              max={12}
+              onChange={v => { playTypewriter(); handleDateChange("month", Number(v)); }}
+              options={Array.from({length: 12}, (_, i) => i + 1)}
+              monthNames={["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]}
+            />
+            <DropdownDial
+              label="Year"
+              value={selectedDate.year}
+              min={1800}
+              max={today.getFullYear()}
+              onChange={v => { playTypewriter(); handleDateChange("year", Number(v)); }}
+              options={Array.from({length: today.getFullYear() - 1800 + 1}, (_,i)=> 1800 + i)}
+            />
+          </div>
+          
+          {/* Timeline: Slim Pocket Watch Slider */}
+          <div className="timeline-row">
+            <PocketWatchSlider
+              year={sliderYear}
+              min={1800}
+              max={today.getFullYear()}
+              onChange={val => { playTypewriter(); handleSliderYearChange(val); }}
+            />
+          </div>
+          
+          {/* Random Date Button */}
+          <div className="action-buttons inline-action">
+            <button
+              aria-label="Surprise: Jump to a random date!"
+              className="wax-seal-btn"
+              onClick={() => { playTypewriter(); goToRandomDate(); }}
+              tabIndex={0}
+              onKeyDown={e => { if (e.key === "Enter") { playTypewriter(); goToRandomDate(); } }}
+              title="Random Date"
+              type="button"
+            >
+              🎲 <span className="seal-text">Random Date</span>
+            </button>
+          </div>
+          {/* Sound Toggle */}
+          <div className="action-buttons inline-action">
+            <button
+              className={`sound-toggle-btn${soundOn ? " active" : ""}`}
+              aria-label={soundOn
+                ? "Mute typewriter/phonograph sounds"
+                : "Enable typewriter/phonograph sounds"
+              }
+              onClick={() => { playTypewriter(); setSoundOn(v => !v); }}
+              type="button"
+            >
+              {soundOn ? "🔊 Sound On" : "🔈 Sound Off"}
+            </button>
+          </div>
         </section>
 
         {/* Event Feed (with loading animation and accessibility/aria) */}
