@@ -144,25 +144,63 @@ body,
 }
 
 /* --- POCKET WATCH TIMELINE --- */
-.pocket-timeline {
-  margin: 1.1em auto;
-  width: 99%;
+/* --- CONTROLS HORIZONTAL ROW --- */
+.control-row {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  gap: 1.2em;
+  justify-content: center;
+  align-items: stretch;
+  background: var(--parchment-dark);
+  border-radius: 24px;
+  border: 2.7px double var(--accent);
+  box-shadow: 0 2.5px 9px #e5dab250;
+  padding: 0.55em 1vw;
+  margin: 1.3em 0 1.35em 0;
+  flex-wrap: wrap;
 }
+.timeline-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+}
+.rotary-date-picker {
+  display: flex;
+  gap: 1em;
+  justify-content: center;
+  align-items: center;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  padding: 0;
+}
+
+.pocket-timeline,
+.pocket-watch-slider,
+.pocket-timeline section,
+.pocket-timeline div {
+  /* Hide the old timeline section styling, override for compact inline row */
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: none !important;
+}
+
 .pocket-watch-slider {
   display: flex;
   flex-direction: column;
   align-items: center;
   background: linear-gradient(180deg, #dcc28c 80%, #fff6e3 100%);
-  border-radius: 999px;
-  border: 3.7px solid var(--watch-gold);
-  box-shadow: 0 0 10px 2px #c8ad7f44;
-  padding: 1.1em 2em 2em 2em;
-  max-width: 380px;
-  width: 99vw;
+  border-radius: 26px;
+  border: 2.2px solid var(--watch-gold);
+  box-shadow: 0 0 8px 2px #c8ad7f33;
+  padding: 0.4em 0.6em 0.6em 0.6em;
+  max-width: 130px;
+  width: 100%;
   position: relative;
+  min-width: 115px;
 }
 .watch-face {
   width: 100%;
@@ -172,15 +210,18 @@ body,
 }
 .watch-label {
   font-family: 'Playfair Display', serif;
-  font-size: 1.22em;
+  font-size: 0.97em;
   color: var(--primary);
   text-shadow: 0 2px 0 var(--accent);
-  margin-bottom: 0.7em;
+  margin-bottom: 0.33em;
 }
 .timeline-range {
-  width: 96%;
-  max-width: 330px;
+  width: 86%;
+  max-width: 90px;
   accent-color: var(--watch-gold);
+  height: 10px !important;
+  min-height: 10px !important;
+  margin: 0.2em 0 0.22em 0;
 }
 .watch-marks {
   width: 96%;
