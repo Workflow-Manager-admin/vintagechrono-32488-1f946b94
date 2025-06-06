@@ -439,10 +439,9 @@ function App() {
 }
 
 /**
- * DropdownDial: Date part picker in a rotary drum style with dropdown menu inside.
- * Vintage-styled for maximum authenticity; supports months with short names option.
+ * DropdownOnly: Pure dropdown (styled vintage) for day/month/year/timeline/year pickers and selectors.
  */
-function DropdownDial({
+function DropdownOnly({
   label,
   min,
   max,
@@ -450,61 +449,136 @@ function DropdownDial({
   onChange,
   accent,
   options,
-  monthNames
+  monthNames,
+  isTimeline
 }) {
   return (
-    <div className={`dial-selector${accent ? " accent" : ""}`}>
-      <label className="dial-label">{label}</label>
-      <div className="dial-drum" aria-label={label}>
+    <div className={`vintage-dropdown-block${accent ? " accent" : ""}`} style={{ width: "100%" }}>
+      <label
+        className="dropdown-label"
+        style={{
+          display: "block",
+          fontFamily: "'Cormorant Garamond', serif",
+          fontWeight: 900,
+          fontSize: isTimeline ? "1.15rem" : "1.23rem",
+          color: "var(--secondary)",
+          marginBottom: "5px",
+          letterSpacing: ".5px",
+        }}
+      >
+        {label}
+      </label>
+      <select
+        className="vintage-dropdown-menu"
+        aria-label={`Select ${label}`}
+        value={value}
+        style={{
+          width: "100%",
+          padding: "0.62em 1.5em 0.62em 1.15em",
+          fontSize: "1.13em",
+          border: isTimeline ? "2.6px solid var(--watch-gold)" : "2.6px solid var(--accent)",
+          background: isTimeline
+            ? "radial-gradient(circle at 50% 60%, #fffbe8 83%, #dcc28c 100%)"
+            : "radial-gradient(circle at 55% 62%, #fffbe0 82%, #e9dcc3 100%)",
+          fontFamily: "'Playfair Display', serif",
+          fontWeight: 900,
+          borderRadius: "17px",
+          boxShadow: isTimeline
+            ? "0 2.5px 9px #eadabb55, 0 0.5px 0 #bfa77a22"
+            : "0 2px 7px #dfc57c33, 0 0.5px 0 #c8ad7f21",
+          color: "var(--primary)",
+          appearance: "none",
+          WebkitAppearance: "none",
+          outline: "none",
+          cursor: "pointer",
+          textAlign: "center",
+        }}
+        onChange={e => onChange(Number(e.target.value))}
+      >
+        {options
+          ? options.map((v, i) => (
+              <option key={v} value={v}>
+                {monthNames && label === "Month"
+                  ? monthNames[v - 1]
+                  : v}
+              </option>
+            ))
+          : Array.from({ length: max - min + 1 }, (_, i) =>
+              <option key={min + i} value={min + i}>{min + i}</option>
+            )}
+      </select>
+    </div>
+  );
+}
+
+/**
+ * RandomDateDropdown: Fake dropdown for Random Date action to keep interaction style consistent.
+ */
+function RandomDateDropdown({ onRandom }) {
+  return (
+    <div className="vintage-dropdown-block" style={{ width: "100%" }}>
+      <label
+        className="dropdown-label"
+        style={{
+          display: "block",
+          fontFamily: "'Cormorant Garamond', serif",
+          fontWeight: 900,
+          fontSize: "1.18rem",
+          color: "var(--secondary)",
+          marginBottom: "5px",
+          letterSpacing: ".4px",
+        }}
+      >
+        Random Date
+      </label>
+      <div style={{ position: "relative", width: "100%" }}>
+        {/* Visually, a dropdown, functionally a button */}
         <button
-          className="dial-btn"
-          aria-label={`Decrease ${label}`}
-          onClick={() => onChange(Math.max(min, value - 1))}
-          tabIndex={0}
-          type="button"
-        >
-          ◀
-        </button>
-        {/* Inline dropdown */}
-        <select
-          className="dial-number"
-          aria-label={`Select ${label}`}
+          className="vintage-dropdown-menu surprise-dropdown"
+          aria-label="Jump to a random date!"
           style={{
-            fontSize: "1.19em",
-            border: "none",
-            background: "transparent",
+            width: "100%",
+            padding: "0.61em 1.5em 0.61em 1.2em",
+            fontSize: "1.12em",
+            border: "2.4px solid var(--accent)",
+            background: "radial-gradient(circle, #f3e1bc 65%, #bfa77a 100%)",
+            borderRadius: "17px",
             fontFamily: "'Playfair Display', serif",
             fontWeight: 900,
-            color: "inherit",
-            textAlign: "center",
+            color: "var(--primary)",
             appearance: "none",
-            WebkitAppearance: "none",
             outline: "none",
-            cursor: "pointer"
+            cursor: "pointer",
+            textAlign: "left",
+            position: "relative",
+            boxShadow: "0 0.5px 8px #baa87c30",
+            display: "flex",
+            alignItems: "center",
+            gap: ".7em"
           }}
-          value={value}
-          onChange={e => onChange(Number(e.target.value))}
-        >
-          {options
-            ? options.map((v, i) => (
-                <option key={v} value={v}>
-                  {monthNames && label === "Month"
-                    ? monthNames[v-1]
-                    : v}
-                </option>
-              ))
-            : Array.from({ length: max - min + 1 }, (_, i) =>
-                <option key={min + i} value={min + i}>{min + i}</option>
-              )}
-        </select>
-        <button
-          className="dial-btn"
-          aria-label={`Increase ${label}`}
-          onClick={() => onChange(Math.min(max, value + 1))}
           tabIndex={0}
           type="button"
+          onClick={() => onRandom()}
+          onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onRandom(); } }}
         >
-          ▶
+          <span aria-hidden="true" style={{
+              fontSize: "1.20em",
+              marginRight: "0.7em",
+              verticalAlign: "-0.07em"
+          }}>🎲</span>
+          <span className="seal-text" style={{
+              marginLeft: "0",
+              fontFamily: "'Playfair Display', serif",
+              fontWeight: 700
+          }}>Jump to a random date</span>
+          <span aria-hidden="true" style={{
+            position: "absolute",
+            right: "1.1em",
+            top: "50%",
+            transform: "translateY(-50%)",
+            color: "#bfa77a",
+            fontSize: "1.11em"
+          }}>▼</span>
         </button>
       </div>
     </div>
