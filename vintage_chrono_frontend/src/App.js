@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
 /*
- * Util: useDebouncedSound — returns a function to play a sound with debouncing
+ * Util: useDebouncedSound — returns a function to play a sound with debouncing and overlap-protection
  */
+// PUBLIC_INTERFACE
 function useDebouncedSound(audioUrl, enabled, volume = 0.19, debounceMs = 100) {
   // audioUrl: string (path to sound)
   // enabled: boolean (sound state)
@@ -12,34 +13,31 @@ function useDebouncedSound(audioUrl, enabled, volume = 0.19, debounceMs = 100) {
   const lastPlayed = useRef(0);
   const audioRef = useRef(null);
 
-  // PUBLIC_INTERFACE
-  /** Returns a playSound function which triggers the sound at most once per debounce interval. */
+  /** Returns a playSound function which triggers the sound at most once per debounce interval and prevents overlap. */
   function playSound() {
     if (!enabled) return;
     const now = Date.now();
     if (now - lastPlayed.current < debounceMs) return;
     lastPlayed.current = now;
     try {
-      // Always restart from beginning for "click" effect
+      // Single instance for consistent non-overlap
       if (!audioRef.current) {
-        // Never re-load if used repeatedly (single instance for this sound)
         audioRef.current = new window.Audio(audioUrl);
         audioRef.current.volume = volume;
       } else {
-        // The browser may not allow rapid play() due to restrictions, but we handle .pause()/.currentTime
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
       }
+      // Prevent stacking: only play if not already nearly playing (avoid 'popcorn' effect in extreme rapid clicks)
+      // let it start; browser policy may silently ignore super-fast re-triggers
       audioRef.current.play();
     } catch {}
   }
   return playSound;
 }
+
 // PUBLIC_INTERFACE
 // VintageChrono Main Container Component
-// Implements all UI, logic, and responsive vintage aesthetics per requirements.
-// Now including: Wikipedia 'On This Day' API integration, all interactive controls,
-// loading animation, accessibility and responsiveness.
 function App() {
   // --- STATE MANAGEMENT ---
   // Today
@@ -62,7 +60,7 @@ function App() {
   // Sound state for toggling effects
   const [soundOn, setSoundOn] = useState(false);
 
-  // Store last fetch date for minimal loads (avoid duplicate API fetches)
+  // Store last fetch date for minimal loads
   const lastFetchedDate = useRef(null);
 
   // Refs for sound samples
@@ -109,7 +107,7 @@ function App() {
     playQuill();
 
     try {
-      // Wikipedia "On This Day" endpoint; e.g. .../events/7/4 (does not filter by year, so filter client-side)
+      // Wikipedia "On This Day" endpoint
       const resp = await fetch(
         `https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/${month}/${day}`
       );
@@ -117,13 +115,9 @@ function App() {
 
       const data = await resp.json();
 
-      // Filter or re-sort so that only events equal to the selected year (if possible),
-      // otherwise show top events and highlight those that match year
-      // We'll prefer events for `year`, but fallback to giving any top events
       let filteredEvents = [];
       if (Array.isArray(data.events)) {
         filteredEvents = data.events.filter(ev => Number(ev.year) === Number(year));
-        // If not enough events for this year, pad with other events for date
         if (filteredEvents.length < 1) {
           filteredEvents = data.events.slice(0, 10);
         }
@@ -143,7 +137,6 @@ function App() {
         },
       ]);
     }
-    // Give a short min time for animation
     setTimeout(() => setLoading(false), 800);
   }
 
@@ -162,7 +155,7 @@ function App() {
     typewriterSound();
     setSelectedDate((prev) => {
       let next = { ...prev, [part]: value };
-      // When changing month/year: clamp day just in case (for Feb/leap/short months)
+      // Clamp for Feb/leap months
       next.day = clampDay(next.year, next.month, next.day);
       return next;
     });
@@ -172,13 +165,11 @@ function App() {
     setSelectedDate((prev) => ({
       ...prev,
       year,
-      // Clamp day for Feb/short months
       day: clampDay(year, prev.month, prev.day),
     }));
   }
   function goToRandomDate() {
     typewriterSound();
-    // Random year/month/day within valid ranges
     const randomYear = Math.floor(Math.random() * (today.getFullYear() - 1800 + 1)) + 1800;
     const randomMonth = Math.floor(Math.random() * 12) + 1;
     const maxDay = new Date(randomYear, randomMonth, 0).getDate();
@@ -205,14 +196,56 @@ function App() {
   // --- UI EFFECTS: Reload events on date change ---
   useEffect(() => {
     fetchWikipediaEvents(selectedDate);
-    setSliderYear(selectedDate.year); // keep UI timeline in sync
+    setSliderYear(selectedDate.year);
     // eslint-disable-next-line
-  }, [selectedDate.year, selectedDate.month, selectedDate.day]); // always refetch if any part changes
+  }, [selectedDate.year, selectedDate.month, selectedDate.day]);
 
   useEffect(() => {
-    // If user changes year via rotary or slider, sync sliderYear
     setSliderYear(selectedDate.year);
   }, [selectedDate.year]);
+
+  // Attach global typewriter sound to all focus/keyboard/interactive UI (buttons, selects, input sliders)
+  useEffect(() => {
+    if (!soundOn) return;
+
+    // Listeners for clicks and keys on interactive elements
+    const handleUiClick = (e) => {
+      // Limit to button, select, input[type="range"],[type="button"]
+      const tag = e.target.tagName;
+      if (
+        tag === "BUTTON" ||
+        tag === "SELECT" ||
+        (tag === "INPUT" && ["button", "range"].includes(e.target.type))
+      ) {
+        typewriterSound();
+      }
+    };
+
+    const handleUiKey = (e) => {
+      const tag = e.target.tagName;
+      // Trigger for Enter/Space/ArrowUp/ArrowDown/Left/Right on interactive el (button, select, slider)
+      if (
+        (tag === "BUTTON" || tag === "SELECT" ||
+         (tag === "INPUT" && ["button", "range"].includes(e.target.type))) &&
+        (
+          e.key === "Enter" ||
+          e.key === " " ||
+          ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)
+        )
+      ) {
+        typewriterSound();
+      }
+    };
+
+    document.addEventListener("click", handleUiClick, true);
+    document.addEventListener("keydown", handleUiKey, true);
+
+    return () => {
+      document.removeEventListener("click", handleUiClick, true);
+      document.removeEventListener("keydown", handleUiKey, true);
+    };
+    // eslint-disable-next-line
+  }, [soundOn]); // (Re-attach if toggled on/off)
 
   // --- JSX-RENDER ---
   return (
@@ -225,20 +258,58 @@ function App() {
         style={{ display: "none" }}
         aria-hidden="true"
       />
-      {/* Masthead */}
+      {/* Masthead with gradient & vintage style */}
       <header className="vintage-masthead">
         <span
           className="masthead-text"
-          style={{ fontFamily: "Cormorant Garamond, Playfair Display, serif" }}
+          style={{
+            fontFamily: "Cormorant Garamond, Playfair Display, serif",
+            background:
+              "linear-gradient(90deg, #6a4e42 8%, #bfa77a 38%, #f3e1bc 63%, #c8ad7f 90%)",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            textFillColor: "transparent",
+            display: "inline-block",
+          }}
         >
-          <span className="dropcap-v" aria-hidden="true">𝒫𝒶𝓈𝓉</span>
+          {/* Gradient Dropcap */}
+          <span
+            className="dropcap-v"
+            aria-hidden="true"
+            style={{
+              background:
+                "linear-gradient(120deg, #bfa77a 12%, #ab845a 85%, #6a4e42 95%)",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              textFillColor: "transparent",
+              fontFamily: "inherit",
+              fontWeight: 900,
+            }}
+          >
+            𝒫𝒶𝓈𝓉
+          </span>
           Blast
         </span>
-        <span className="masthead-sub">VintageChrono</span>
+        <span
+          className="masthead-sub"
+          style={{
+            background: "linear-gradient(90deg, #bfa77a 20%, #6a4e42 80%)",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            textFillColor: "transparent",
+            fontFamily: "Playfair Display, Cormorant Garamond, serif",
+            letterSpacing: 2,
+          }}
+        >
+          VintageChrono
+        </span>
       </header>
 
       <main className="chronomain">
-        {/* Controls Row: rotary date picker, timeline slider, random date, and sound toggle */}
+        {/* Controls Row */}
         <section className="control-row" aria-label="All controls">
           {/* Date Picker */}
           <div className="rotary-date-picker">
@@ -269,8 +340,7 @@ function App() {
               options={Array.from({length: today.getFullYear() - 1800 + 1}, (_,i)=> 1800 + i)}
             />
           </div>
-          
-          {/* Timeline: Slim Pocket Watch Slider */}
+          {/* Timeline: Pocket Watch Slider */}
           <div className="timeline-row">
             <PocketWatchSlider
               year={sliderYear}
@@ -279,7 +349,6 @@ function App() {
               onChange={val => { typewriterSound(); handleSliderYearChange(val); }}
             />
           </div>
-          
           {/* Random Date Button */}
           <div className="action-buttons inline-action">
             <button
@@ -310,7 +379,7 @@ function App() {
           </div>
         </section>
 
-        {/* Event Feed (with loading animation and accessibility/aria) */}
+        {/* Event Feed */}
         <section className="event-feed newspaper-bg" aria-live="polite">
           {loading && <LoadingAnimation />}
           {!loading && events && <EventsFeed events={events} dateObj={selectedDate} />}
@@ -370,7 +439,7 @@ function DropdownDial({
         >
           ◀
         </button>
-        {/* Inline dropdown which blends as rotary/vintage appearance */}
+        {/* Inline dropdown */}
         <select
           className="dial-number"
           aria-label={`Select ${label}`}
@@ -419,7 +488,6 @@ function DropdownDial({
 // --- POCKET WATCH TIMELINE SLIDER ---
 function PocketWatchSlider({ year, min, max, onChange }) {
   const sliderRef = useRef();
-  // Themed "face" & pointer; keyboard accessible.
   return (
     <div className="pocket-watch-slider" tabIndex={0}>
       <div className="watch-face">
@@ -470,7 +538,6 @@ function EventsFeed({ events, dateObj }) {
 
 // --- NEWSPAPER CLIPPING CARD ---
 function NewspaperClipping({ event, idx }) {
-  // Use random smudge for accent/hover
   return (
     <article className="clipping-card" tabIndex={0}>
       <div className="clipping-year">{event.year || "?"}</div>
@@ -498,7 +565,6 @@ function NewspaperClipping({ event, idx }) {
 
 // --- LOADING ANIMATION (Paper/Quill) ---
 function LoadingAnimation() {
-  // Quill writing animation with sheet movement
   return (
     <div className="loading-anim" aria-label="Loading">
       <div className="paper-flip">
