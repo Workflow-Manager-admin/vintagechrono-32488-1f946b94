@@ -68,6 +68,17 @@ function App() {
   // Refs for sound samples
   const quillAudioRef = useRef();
 
+  // --- TYPEWRITER SOUND (debounced) ---
+  // Use relative path to public asset (React serves from public/ as root)
+  const typewriterSound = useDebouncedSound(
+    process.env.PUBLIC_URL
+      ? process.env.PUBLIC_URL + "/typewriter-click.mp3"
+      : "/typewriter-click.mp3",
+    soundOn,
+    0.21,
+    92 // ms: Tune so fast UI doesn't overlap/clickstorm.
+  );
+
   // --- UTILITY: Clamp last valid DOM date for year/month ---
   function clampDay(year, month, desiredDay) {
     // month is 1-based; day must be valid for the month (28/29/30/31)
