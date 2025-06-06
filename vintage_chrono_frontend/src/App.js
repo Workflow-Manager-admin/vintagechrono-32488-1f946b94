@@ -260,48 +260,68 @@ function App() {
       />
       {/* Masthead with gradient & vintage style */}
       <header className="vintage-masthead">
+        {/* --- Enhanced Premium Vintage Gradient Title --- */}
         <span
           className="masthead-text"
           style={{
             fontFamily: "Cormorant Garamond, Playfair Display, serif",
+            fontWeight: 900,
+            letterSpacing: 3,
+            display: "inline-block",
+            // Multi-stop gold/sepia gradient with subtle soft vignetting and paper blend.
             background:
-              "linear-gradient(90deg, #6a4e42 8%, #bfa77a 38%, #f3e1bc 63%, #c8ad7f 90%)",
+              "linear-gradient(91deg, #6a4e42 5%, #bfa77a 30%, #f3e1bc 53%, #c8ad7f 70%, #eadaba 88%, #ab845a 98%), url('https://www.transparenttextures.com/patterns/old-mathematics.png')",
+            backgroundBlendMode: "soft-light, multiply",
             WebkitBackgroundClip: "text",
             backgroundClip: "text",
             WebkitTextFillColor: "transparent",
             textFillColor: "transparent",
-            display: "inline-block",
+            textShadow: "0 2px 0 #bfa77a, 0 3px 12px #eadaba9c",
+            filter: "contrast(1.16) brightness(1.08)",
           }}
         >
-          {/* Gradient Dropcap */}
+          {/* Gradient Dropcap Past */}
           <span
             className="dropcap-v"
             aria-hidden="true"
             style={{
+              fontFamily: "inherit",
+              fontWeight: 900,
+              // Paper-blend, metallic gold gradient for the dropcap
               background:
-                "linear-gradient(120deg, #bfa77a 12%, #ab845a 85%, #6a4e42 95%)",
+                "linear-gradient(119deg, #bfa77a 10%, #c8ad7f 39%, #f7e5b9 65%, #ab845a 85%, #6a4e42 100%), url('https://www.transparenttextures.com/patterns/old-mathematics.png')",
+              backgroundBlendMode: "overlay, multiply",
               WebkitBackgroundClip: "text",
               backgroundClip: "text",
               WebkitTextFillColor: "transparent",
               textFillColor: "transparent",
-              fontFamily: "inherit",
-              fontWeight: 900,
+              textShadow: "0 2px 0 #ab845a99, 0 3px 12px #eadaba80",
+              filter: "contrast(1.19) brightness(1.12)",
+              letterSpacing: 2
             }}
           >
             𝒫𝒶𝓈𝓉
           </span>
           Blast
         </span>
+        {/* Subtitle with gentle horizontal gold/sepia ribbon gradient */}
         <span
           className="masthead-sub"
           style={{
-            background: "linear-gradient(90deg, #bfa77a 20%, #6a4e42 80%)",
+            background:
+              "linear-gradient(90deg, #ab845a 9%, #eadaba 57%, #bfa77a 90%)",
             WebkitBackgroundClip: "text",
             backgroundClip: "text",
             WebkitTextFillColor: "transparent",
             textFillColor: "transparent",
             fontFamily: "Playfair Display, Cormorant Garamond, serif",
             letterSpacing: 2,
+            fontStyle: "italic",
+            fontWeight: 700,
+            // Add a whisper of texture for "parchment"
+            backgroundImage:
+              "linear-gradient(90deg, #ab845a 9%, #eadaba 57%, #bfa77a 90%), url('https://www.transparenttextures.com/patterns/old-mathematics.png')",
+            backgroundBlendMode: "soft-light, multiply",
           }}
         >
           VintageChrono
